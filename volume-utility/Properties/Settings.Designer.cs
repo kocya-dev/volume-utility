@@ -58,5 +58,17 @@ namespace volume_utility.Properties {
                 this["Opacity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Visible {
+            get {
+                return ((bool)(this["Visible"]));
+            }
+            set {
+                this["Visible"] = value;
+            }
+        }
     }
 }

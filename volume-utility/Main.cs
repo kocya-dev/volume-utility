@@ -1,5 +1,6 @@
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
+using System.Windows.Forms; 
 using volume_utility.Properties;
 using volume_utility.Utils;
 using volume_utility.View;
@@ -16,7 +17,14 @@ namespace volume_utility
         /// UI更新用のコンテキスト
         /// </summary>
         private SynchronizationContext? _context = null;
+        /// <summary>
+        /// ドラッグ可能クラス
+        /// </summary>
         private Draggable _draggable;
+        /// <summary>
+        /// ウィンドウの表示状態
+        /// </summary>
+        private bool _isWindowVisible = false;
 
         public Main()
         {
@@ -42,9 +50,10 @@ namespace volume_utility
             // UIに関わる情報を更新
             _context = SynchronizationContext.Current;
             _trackBarVolume.Value = (int)_volumeController.CurrentVolume;
+            _toolStripMenuItemVisible.Checked = _isWindowVisible;
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
-
+            UpdateWindowVisibility();
             base.OnLoad(e);
         }
 
@@ -59,6 +68,19 @@ namespace volume_utility
             _volumeController.Dispose();
             _draggable.Dispose();
             base.OnFormClosed(e);
+        }
+
+        /// <summary>
+        /// フォームリサイズ時の処理
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnResize(EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+            }
+            base.OnResize(e);
         }
 
         /// <summary>
@@ -174,6 +196,18 @@ namespace volume_utility
         }
 
         /// <summary>
+        /// 表示メニューのクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _toolStripMenuItemVisible_Click(object sender, EventArgs e)
+        {
+            _toolStripMenuItemVisible.Checked = !_toolStripMenuItemVisible.Checked;
+            _isWindowVisible = _toolStripMenuItemVisible.Checked;
+            UpdateWindowVisibility();
+        }
+
+        /// <summary>
         /// 設定ダイアログを開く
         /// </summary>
         private void OpenConfigDialog()
@@ -207,6 +241,7 @@ namespace volume_utility
             _volumeController.MinVolume = Settings.Default.MinValue;
             _volumeController.MaxVolume = Settings.Default.MaxValue;
             Opacity = Settings.Default.Opacity;
+            _isWindowVisible = Settings.Default.Visible;
         }
 
         /// <summary>
@@ -217,8 +252,35 @@ namespace volume_utility
             Settings.Default.MinValue = (int)_numericUpDownMin.Value;
             Settings.Default.MaxValue = (int)_numericUpDownMax.Value;
             Settings.Default.Opacity = Opacity;
+            Settings.Default.Visible = _isWindowVisible;
             Settings.Default.Save();
         }
-
+        /// <summary>
+        /// ウィンドウの表示状態を更新する
+        /// </summary>
+        private void UpdateWindowVisibility()
+        {
+            if (_isWindowVisible)
+            {
+                Show();
+                WindowState = FormWindowState.Normal;
+                Activate();
+            }
+            else
+            {
+                WindowState = FormWindowState.Minimized;
+            }
+        }
+        /// <summary>
+        /// 通知アイコンのダブルクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            _isWindowVisible = true;
+            _toolStripMenuItemVisible.Checked = true;
+            UpdateWindowVisibility();
+        }
     }
 }
