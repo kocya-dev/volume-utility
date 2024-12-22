@@ -38,6 +38,7 @@
             _toolStripMenuItemConfig = new ToolStripMenuItem();
             _toolStripSeparator = new ToolStripSeparator();
             _toolStripMenuItemExit = new ToolStripMenuItem();
+            _buttonConfig = new Button();
             ((System.ComponentModel.ISupportInitialize)_trackBarVolume).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMin).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMax).BeginInit();
@@ -119,6 +120,18 @@
             _toolStripMenuItemExit.Text = "終了(&X)";
             _toolStripMenuItemExit.Click += _toolStripMenuItemExit_Click;
             // 
+            // _buttonConfig
+            // 
+            _buttonConfig.FlatAppearance.BorderSize = 0;
+            _buttonConfig.FlatStyle = FlatStyle.Flat;
+            _buttonConfig.Image = Properties.Resources.config;
+            _buttonConfig.Location = new Point(356, 42);
+            _buttonConfig.Name = "_buttonConfig";
+            _buttonConfig.Size = new Size(40, 40);
+            _buttonConfig.TabIndex = 5;
+            _buttonConfig.UseVisualStyleBackColor = true;
+            _buttonConfig.Click += _buttonConfig_Click;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -126,6 +139,7 @@
             BackColor = SystemColors.Control;
             ClientSize = new Size(411, 89);
             ContextMenuStrip = _contextMenuStrip;
+            Controls.Add(_buttonConfig);
             Controls.Add(_checkBoxMute);
             Controls.Add(_numericUpDownMax);
             Controls.Add(_numericUpDownMin);
@@ -155,5 +169,6 @@
         private ToolStripMenuItem _toolStripMenuItemExit;
         private ToolStripMenuItem _toolStripMenuItemConfig;
         private ToolStripSeparator _toolStripSeparator;
+        private Button _buttonConfig;
     }
 }

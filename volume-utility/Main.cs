@@ -170,7 +170,15 @@ namespace volume_utility
         /// <param name="e"></param>
         private void _toolStripMenuItemConfig_Click(object sender, EventArgs e)
         {
-            using(var dialog = new VolumeUtilityConfigDialog())
+            OpenConfigDialog();
+        }
+
+        /// <summary>
+        /// 設定ダイアログを開く
+        /// </summary>
+        private void OpenConfigDialog()
+        {
+            using (var dialog = new VolumeUtilityConfigDialog())
             {
                 dialog.OpacityValue = Opacity;
                 if (dialog.ShowDialog(this) == DialogResult.OK)
@@ -178,6 +186,16 @@ namespace volume_utility
                     Opacity = dialog.OpacityValue;
                 }
             }
+        }
+
+        /// <summary>
+        /// 設定ボタンクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _buttonConfig_Click(object sender, EventArgs e)
+        {
+            OpenConfigDialog();
         }
         /// <summary>
         /// 設定の読み込み
@@ -201,5 +219,6 @@ namespace volume_utility
             Settings.Default.Opacity = Opacity;
             Settings.Default.Save();
         }
+
     }
 }
