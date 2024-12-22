@@ -1,5 +1,6 @@
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
+using volume_utility.Properties;
 using volume_utility.Utils;
 using volume_utility.View;
 
@@ -24,10 +25,12 @@ namespace volume_utility
             var attribute = NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
             var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
             NativeMethods.DwmSetWindowAttribute(this.Handle, attribute, ref preference, sizeof(uint));
+
             _draggable = new Draggable(this);
             _volumeController = new VolumeController(VolumeChangedCallback);
-        }
 
+            LoadSettings();
+        }
         /// <summary>
         /// フォームロード時の処理
         /// </summary>
@@ -35,9 +38,9 @@ namespace volume_utility
         protected override void OnLoad(EventArgs e)
         {
             Debug.Assert(SynchronizationContext.Current != null);
+
+            // UIに関わる情報を更新
             _context = SynchronizationContext.Current;
-            _volumeController.MinVolume = (float)_numericUpDownMin.Value;
-            _volumeController.MaxVolume = (float)_numericUpDownMax.Value;
             _trackBarVolume.Value = (int)_volumeController.CurrentVolume;
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
@@ -51,6 +54,8 @@ namespace volume_utility
         /// <param name="e"></param>
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            SaveSettings();
+
             _volumeController.Dispose();
             _draggable.Dispose();
             base.OnFormClosed(e);
@@ -173,6 +178,28 @@ namespace volume_utility
                     Opacity = dialog.OpacityValue;
                 }
             }
+        }
+        /// <summary>
+        /// 設定の読み込み
+        /// </summary>
+        private void LoadSettings()
+        {
+            _numericUpDownMin.Value = Settings.Default.MinValue;
+            _numericUpDownMax.Value = Settings.Default.MaxValue;
+            _volumeController.MinVolume = Settings.Default.MinValue;
+            _volumeController.MaxVolume = Settings.Default.MaxValue;
+            Opacity = Settings.Default.Opacity;
+        }
+
+        /// <summary>
+        /// 設定の保存
+        /// </summary>
+        private void SaveSettings()
+        {
+            Settings.Default.MinValue = (int)_numericUpDownMin.Value;
+            Settings.Default.MaxValue = (int)_numericUpDownMax.Value;
+            Settings.Default.Opacity = Opacity;
+            Settings.Default.Save();
         }
     }
 }
