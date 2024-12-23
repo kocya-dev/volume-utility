@@ -155,7 +155,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(411, 89);
+            ClientSize = new Size(412, 89);
             ContextMenuStrip = _contextMenuStrip;
             Controls.Add(_buttonConfig);
             Controls.Add(_checkBoxMute);

@@ -38,6 +38,21 @@ namespace volume_utility.View
         protected override void OnLoad(EventArgs e)
         {
             Opacity = OpacityValue;
+            if (Owner != null)
+            {
+                Screen? screen = Screen.PrimaryScreen;
+                Point rightBottom = new Point(screen == null ? 0 : screen.WorkingArea.Right, screen == null ? 0 : screen.WorkingArea.Bottom);
+                Size a= new Size(Width, Height);
+                // ディスプレイの表示範囲からはみ出る場合は内側に表示されるよう補正する
+                // 非表示中はX座標=0。この場合もウィンドウ右下に出したいのではみ出た扱いにする。
+                int x = (Owner.Location.X + Width > rightBottom.X || Owner.Location.X <= 0)
+                    ? rightBottom.X - Width
+                    : Owner.Location.X;
+                int y = (Owner.Location.Y + Height > rightBottom.Y || Owner.Location.Y <= 0)
+                    ? rightBottom .Y - Height
+                    : Owner.Location.Y + Owner.Size.Height;
+                Location = new Point(x, y);
+            }
             base.OnLoad(e);
         }
 

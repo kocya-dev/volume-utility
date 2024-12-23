@@ -38,7 +38,7 @@
             // 
             // _trackBarOpacity
             // 
-            _trackBarOpacity.Location = new Point(113, 12);
+            _trackBarOpacity.Location = new Point(161, 12);
             _trackBarOpacity.Maximum = 100;
             _trackBarOpacity.Minimum = 20;
             _trackBarOpacity.Name = "_trackBarOpacity";
@@ -51,16 +51,16 @@
             // _labelOpacity
             // 
             _labelOpacity.AutoSize = true;
-            _labelOpacity.Location = new Point(12, 12);
+            _labelOpacity.Location = new Point(12, 24);
             _labelOpacity.Name = "_labelOpacity";
-            _labelOpacity.Size = new Size(101, 15);
+            _labelOpacity.Size = new Size(143, 15);
             _labelOpacity.TabIndex = 0;
-            _labelOpacity.Text = "不透明度(20-100):";
+            _labelOpacity.Text = "ウィンドウ不透明度(20-100):";
             // 
             // _buttonOk
             // 
             _buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            _buttonOk.Location = new Point(197, 92);
+            _buttonOk.Location = new Point(244, 93);
             _buttonOk.Name = "_buttonOk";
             _buttonOk.Size = new Size(75, 23);
             _buttonOk.TabIndex = 2;
@@ -71,7 +71,7 @@
             // _buttonCancel
             // 
             _buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            _buttonCancel.Location = new Point(278, 92);
+            _buttonCancel.Location = new Point(325, 93);
             _buttonCancel.Name = "_buttonCancel";
             _buttonCancel.Size = new Size(75, 23);
             _buttonCancel.TabIndex = 3;
@@ -93,7 +93,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(365, 127);
+            ClientSize = new Size(412, 128);
             Controls.Add(_labelCurrentOpacity);
             Controls.Add(_buttonCancel);
             Controls.Add(_buttonOk);
