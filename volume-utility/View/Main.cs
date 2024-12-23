@@ -1,6 +1,7 @@
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
-using System.Windows.Forms; 
+using System.Windows.Forms;
+using volume_utility.Controller;
 using volume_utility.Properties;
 using volume_utility.Utils;
 using volume_utility.View;

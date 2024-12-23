@@ -1,7 +1,7 @@
 ﻿using NAudio.CoreAudioApi;
 using System.Diagnostics;
 
-namespace volume_utility
+namespace volume_utility.Controller
 {
     /// <summary>
     /// ボリューム操作クラス
