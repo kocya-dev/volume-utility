@@ -164,6 +164,7 @@
             Controls.Add(_labelCurrentVolume);
             Controls.Add(_trackBarVolume);
             FormBorderStyle = FormBorderStyle.None;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Main";
             Opacity = 0.75D;
             ShowInTaskbar = false;
