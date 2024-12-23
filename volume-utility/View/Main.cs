@@ -26,6 +26,10 @@ namespace volume_utility
         /// ウィンドウの表示状態
         /// </summary>
         private bool _isWindowVisible = false;
+        /// <summary>
+        /// スタートアップフラグ
+        /// </summary>
+        private bool _isStartup = false;
 
         public Main()
         {
@@ -50,6 +54,7 @@ namespace volume_utility
             _context = SynchronizationContext.Current;
             _trackBarVolume.Value = (int)_volumeController.CurrentVolume;
             _toolStripMenuItemVisible.Checked = _isWindowVisible;
+            _toolStripMenuItemStartup.Checked = _isStartup;
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
             UpdateWindowVisibility();
@@ -205,7 +210,64 @@ namespace volume_utility
             _isWindowVisible = _toolStripMenuItemVisible.Checked;
             UpdateWindowVisibility();
         }
+        /// <summary>
+        /// スタートアップメニューのクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _toolStripMenuItemStartup_Click(object sender, EventArgs e)
+        {
+            _toolStripMenuItemStartup.Checked = !_toolStripMenuItemStartup.Checked;
+            _isStartup = _toolStripMenuItemStartup.Checked;
+            UpdateStartupShortcut();
+        }
 
+        /// <summary>
+        /// 設定ボタンクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _buttonConfig_Click(object sender, EventArgs e)
+        {
+            OpenConfigDialog();
+        }
+        /// <summary>
+        /// 通知アイコンのダブルクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            _isWindowVisible = true;
+            _toolStripMenuItemVisible.Checked = true;
+            UpdateWindowVisibility();
+        }
+        /// <summary>
+        /// 設定の読み込み
+        /// </summary>
+        private void LoadSettings()
+        {
+            _numericUpDownMin.Value = Settings.Default.MinValue;
+            _numericUpDownMax.Value = Settings.Default.MaxValue;
+            _volumeController.MinVolume = Settings.Default.MinValue;
+            _volumeController.MaxVolume = Settings.Default.MaxValue;
+            Opacity = Settings.Default.Opacity;
+            _isWindowVisible = Settings.Default.Visible;
+            _isStartup = Settings.Default.Startup;
+        }
+
+        /// <summary>
+        /// 設定の保存
+        /// </summary>
+        private void SaveSettings()
+        {
+            Settings.Default.MinValue = (int)_numericUpDownMin.Value;
+            Settings.Default.MaxValue = (int)_numericUpDownMax.Value;
+            Settings.Default.Opacity = Opacity;
+            Settings.Default.Visible = _isWindowVisible;
+            Settings.Default.Startup = _isStartup;
+            Settings.Default.Save();
+        }
         /// <summary>
         /// 設定ダイアログを開く
         /// </summary>
@@ -222,39 +284,6 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// 設定ボタンクリック時の処理
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _buttonConfig_Click(object sender, EventArgs e)
-        {
-            OpenConfigDialog();
-        }
-        /// <summary>
-        /// 設定の読み込み
-        /// </summary>
-        private void LoadSettings()
-        {
-            _numericUpDownMin.Value = Settings.Default.MinValue;
-            _numericUpDownMax.Value = Settings.Default.MaxValue;
-            _volumeController.MinVolume = Settings.Default.MinValue;
-            _volumeController.MaxVolume = Settings.Default.MaxValue;
-            Opacity = Settings.Default.Opacity;
-            _isWindowVisible = Settings.Default.Visible;
-        }
-
-        /// <summary>
-        /// 設定の保存
-        /// </summary>
-        private void SaveSettings()
-        {
-            Settings.Default.MinValue = (int)_numericUpDownMin.Value;
-            Settings.Default.MaxValue = (int)_numericUpDownMax.Value;
-            Settings.Default.Opacity = Opacity;
-            Settings.Default.Visible = _isWindowVisible;
-            Settings.Default.Save();
-        }
-        /// <summary>
         /// ウィンドウの表示状態を更新する
         /// </summary>
         private void UpdateWindowVisibility()
@@ -270,16 +299,22 @@ namespace volume_utility
                 WindowState = FormWindowState.Minimized;
             }
         }
+
         /// <summary>
-        /// 通知アイコンのダブルクリック時の処理
+        /// スタートアップショートカットの更新
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void UpdateStartupShortcut()
         {
-            _isWindowVisible = true;
-            _toolStripMenuItemVisible.Checked = true;
-            UpdateWindowVisibility();
+            if (_isStartup)
+            {
+                StartupUtility.Create();
+            }
+            else
+            {
+                StartupUtility.Delete();
+            }
         }
+
+
     }
 }

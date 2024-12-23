@@ -37,6 +37,7 @@
             _checkBoxMute = new CheckBox();
             _contextMenuStrip = new ContextMenuStrip(components);
             _toolStripMenuItemVisible = new ToolStripMenuItem();
+            _toolStripMenuItemStartup = new ToolStripMenuItem();
             _toolStripMenuItemConfig = new ToolStripMenuItem();
             _toolStripSeparator = new ToolStripSeparator();
             _toolStripMenuItemExit = new ToolStripMenuItem();
@@ -100,33 +101,40 @@
             // 
             // _contextMenuStrip
             // 
-            _contextMenuStrip.Items.AddRange(new ToolStripItem[] { _toolStripMenuItemVisible, _toolStripMenuItemConfig, _toolStripSeparator, _toolStripMenuItemExit });
+            _contextMenuStrip.Items.AddRange(new ToolStripItem[] { _toolStripMenuItemVisible, _toolStripMenuItemStartup, _toolStripMenuItemConfig, _toolStripSeparator, _toolStripMenuItemExit });
             _contextMenuStrip.Name = "_contextMenuStrip";
-            _contextMenuStrip.Size = new Size(135, 76);
+            _contextMenuStrip.Size = new Size(213, 120);
             // 
             // _toolStripMenuItemVisible
             // 
             _toolStripMenuItemVisible.Name = "_toolStripMenuItemVisible";
-            _toolStripMenuItemVisible.Size = new Size(134, 22);
+            _toolStripMenuItemVisible.Size = new Size(212, 22);
             _toolStripMenuItemVisible.Text = "常に表示(&V)";
             _toolStripMenuItemVisible.Click += _toolStripMenuItemVisible_Click;
+            // 
+            // _toolStripMenuItemStartup
+            // 
+            _toolStripMenuItemStartup.Name = "_toolStripMenuItemStartup";
+            _toolStripMenuItemStartup.Size = new Size(212, 22);
+            _toolStripMenuItemStartup.Text = "スタートアップ時に起動する(&S)";
+            _toolStripMenuItemStartup.Click += _toolStripMenuItemStartup_Click;
             // 
             // _toolStripMenuItemConfig
             // 
             _toolStripMenuItemConfig.Name = "_toolStripMenuItemConfig";
-            _toolStripMenuItemConfig.Size = new Size(134, 22);
+            _toolStripMenuItemConfig.Size = new Size(212, 22);
             _toolStripMenuItemConfig.Text = "設定(&C)";
             _toolStripMenuItemConfig.Click += _toolStripMenuItemConfig_Click;
             // 
             // _toolStripSeparator
             // 
             _toolStripSeparator.Name = "_toolStripSeparator";
-            _toolStripSeparator.Size = new Size(131, 6);
+            _toolStripSeparator.Size = new Size(209, 6);
             // 
             // _toolStripMenuItemExit
             // 
             _toolStripMenuItemExit.Name = "_toolStripMenuItemExit";
-            _toolStripMenuItemExit.Size = new Size(134, 22);
+            _toolStripMenuItemExit.Size = new Size(212, 22);
             _toolStripMenuItemExit.Text = "終了(&X)";
             _toolStripMenuItemExit.Click += _toolStripMenuItemExit_Click;
             // 
@@ -192,5 +200,6 @@
         private Button _buttonConfig;
         private NotifyIcon _notifyIcon;
         private ToolStripMenuItem _toolStripMenuItemVisible;
+        private ToolStripMenuItem _toolStripMenuItemStartup;
     }
 }
