@@ -24,9 +24,7 @@ namespace volume_utility.View
         public VolumeUtilityConfigDialog()
         {
             InitializeComponent();
-            var attribute = NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
-            var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-            NativeMethods.DwmSetWindowAttribute(this.Handle, attribute, ref preference, sizeof(uint));
+            NativeMethods.EnableRoundWindowStyle(Handle);
 
             _draggable = new Draggable(this);
         }

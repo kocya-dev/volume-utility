@@ -28,5 +28,16 @@ namespace volume_utility.Utils
                                                          DWMWINDOWATTRIBUTE attribute,
                                                          ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute,
                                                          uint cbAttribute);
+        /// <summary>
+        /// ウィンドウの端を丸めるスタイルを有効にする
+        /// </summary>
+        /// <param name="handle"></param>
+        internal static void EnableRoundWindowStyle(nint handle)
+        {
+            var attribute = NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
+            var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+            NativeMethods.DwmSetWindowAttribute(handle, attribute, ref preference, sizeof(uint));
+
+        }
     }
 }
