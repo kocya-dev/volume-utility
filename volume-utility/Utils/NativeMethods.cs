@@ -34,10 +34,9 @@ namespace volume_utility.Utils
         /// <param name="handle"></param>
         internal static void EnableRoundWindowStyle(nint handle)
         {
-            var attribute = NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
-            var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-            NativeMethods.DwmSetWindowAttribute(handle, attribute, ref preference, sizeof(uint));
-
+            var attribute = DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
+            var preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+            DwmSetWindowAttribute(handle, attribute, ref preference, sizeof(uint));
         }
     }
 }
