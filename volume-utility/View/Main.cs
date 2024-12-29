@@ -58,6 +58,7 @@ namespace volume_utility
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
             UpdateWindowVisibility();
+            NativeMethods.StartHook(Handle);
             base.OnLoad(e);
         }
 
@@ -67,6 +68,7 @@ namespace volume_utility
         /// <param name="e"></param>
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            NativeMethods.EndHook();
             SaveSettings();
 
             _volumeController.Dispose();
@@ -85,6 +87,24 @@ namespace volume_utility
                 Hide();
             }
             base.OnResize(e);
+        }
+
+        /// <summary>
+        /// フォームのウィンドウメッセージ処理
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_HOOK_ACTIVATE)
+            {
+                Debug.WriteLine($"WndProc: {m.Msg} {m.WParam} {m.LParam}");
+                Process? p = NativeMethods.getProcess(m.LParam);
+                if (p != null)
+                {
+                    Debug.WriteLine($"{p.ProcessName} {p.MainModule?.FileVersionInfo.ProductName}");//アプリケーションの名前が出てきます
+                }
+            }
+            base.WndProc(ref m);
         }
 
         /// <summary>

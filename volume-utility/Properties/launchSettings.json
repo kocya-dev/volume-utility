@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "volume-utility": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
