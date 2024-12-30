@@ -43,6 +43,7 @@
             _toolStripMenuItemExit = new ToolStripMenuItem();
             _buttonConfig = new Button();
             _notifyIcon = new NotifyIcon(components);
+            _buttonAdd = new Button();
             ((System.ComponentModel.ISupportInitialize)_trackBarVolume).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMin).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMax).BeginInit();
@@ -103,7 +104,7 @@
             // 
             _contextMenuStrip.Items.AddRange(new ToolStripItem[] { _toolStripMenuItemVisible, _toolStripMenuItemStartup, _toolStripMenuItemConfig, _toolStripSeparator, _toolStripMenuItemExit });
             _contextMenuStrip.Name = "_contextMenuStrip";
-            _contextMenuStrip.Size = new Size(213, 120);
+            _contextMenuStrip.Size = new Size(213, 98);
             // 
             // _toolStripMenuItemVisible
             // 
@@ -143,9 +144,9 @@
             _buttonConfig.FlatAppearance.BorderSize = 0;
             _buttonConfig.FlatStyle = FlatStyle.Flat;
             _buttonConfig.Image = Properties.Resources.config;
-            _buttonConfig.Location = new Point(356, 42);
+            _buttonConfig.Location = new Point(364, 50);
             _buttonConfig.Name = "_buttonConfig";
-            _buttonConfig.Size = new Size(40, 40);
+            _buttonConfig.Size = new Size(36, 36);
             _buttonConfig.TabIndex = 5;
             _buttonConfig.UseVisualStyleBackColor = true;
             _buttonConfig.Click += _buttonConfig_Click;
@@ -158,6 +159,18 @@
             _notifyIcon.Visible = true;
             _notifyIcon.MouseDoubleClick += _notifyIcon_MouseDoubleClick;
             // 
+            // _buttonAdd
+            // 
+            _buttonAdd.FlatAppearance.BorderSize = 0;
+            _buttonAdd.FlatStyle = FlatStyle.Flat;
+            _buttonAdd.Image = Properties.Resources.add;
+            _buttonAdd.Location = new Point(322, 50);
+            _buttonAdd.Name = "_buttonAdd";
+            _buttonAdd.Size = new Size(36, 36);
+            _buttonAdd.TabIndex = 6;
+            _buttonAdd.UseVisualStyleBackColor = true;
+            _buttonAdd.Click += _buttonAdd_Click;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -165,6 +178,7 @@
             BackColor = SystemColors.Control;
             ClientSize = new Size(412, 89);
             ContextMenuStrip = _contextMenuStrip;
+            Controls.Add(_buttonAdd);
             Controls.Add(_buttonConfig);
             Controls.Add(_checkBoxMute);
             Controls.Add(_numericUpDownMax);
@@ -201,5 +215,6 @@
         private NotifyIcon _notifyIcon;
         private ToolStripMenuItem _toolStripMenuItemVisible;
         private ToolStripMenuItem _toolStripMenuItemStartup;
+        private Button _buttonAdd;
     }
 }

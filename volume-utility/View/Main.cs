@@ -252,6 +252,16 @@ namespace volume_utility
             OpenConfigDialog();
         }
         /// <summary>
+        /// 追加ボタンクリック時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _buttonAdd_Click(object sender, EventArgs e)
+        {
+            OpenAddAppDialog();
+        }
+
+        /// <summary>
         /// 通知アイコンのダブルクリック時の処理
         /// </summary>
         /// <param name="sender"></param>
@@ -302,6 +312,21 @@ namespace volume_utility
                 }
             }
         }
+        /// <summary>
+        /// アプリ追加ダイアログを開く
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        private void OpenAddAppDialog()
+        {
+            using (var dialog = new ProcessSelectionDialog())
+            {
+                dialog.Opacity = Opacity;
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    Debug.WriteLine($"Selected: {dialog.SelectedProcess?.ProcessName}");
+                }
+            }
+        }
 
         /// <summary>
         /// ウィンドウの表示状態を更新する
@@ -334,7 +359,5 @@ namespace volume_utility
                 StartupUtility.Delete();
             }
         }
-
-
     }
 }
