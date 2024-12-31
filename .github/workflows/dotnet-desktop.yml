@@ -21,6 +21,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        cache: true
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
@@ -34,5 +35,5 @@ jobs:
 
     - name: upload
       run: |
-        dir /s
+        ls -al
 
