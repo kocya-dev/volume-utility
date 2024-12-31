@@ -21,17 +21,17 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
     - name: ビルド(NuGetパッケージ復元あり)
       run: |
-        dotnet workload update
-        dotnet build ${{env.Solution_Name}} -c Release
+        msbuild ${{env.Solution_Name}} /t:Rebuild /p:Configuration=Release;RestorePackagesConfig=True;Platform="x64"
+    - name: 一覧
+      run: tree /f
     - name: ビルド結果のアップロード
       uses: actions/upload-artifact@v4
       with:
         name: bin_Release
         path: .\bin\Release
 
-    - name: upload
-      run: |
-        tree /f
 
