@@ -32,6 +32,7 @@
             _labelProcessName = new Label();
             _labelAppName = new Label();
             _labelVolume = new Label();
+            _buttonRemove = new Button();
             ((System.ComponentModel.ISupportInitialize)_trackBar).BeginInit();
             SuspendLayout();
             // 
@@ -40,9 +41,10 @@
             _trackBar.Location = new Point(231, 4);
             _trackBar.Maximum = 100;
             _trackBar.Name = "_trackBar";
-            _trackBar.Size = new Size(166, 45);
+            _trackBar.Size = new Size(147, 45);
             _trackBar.TabIndex = 0;
             _trackBar.TickFrequency = 10;
+            _trackBar.ValueChanged += _trackBar_ValueChanged;
             // 
             // _labelProcessName
             // 
@@ -63,22 +65,36 @@
             // _labelVolume
             // 
             _labelVolume.AutoSize = true;
-            _labelVolume.Location = new Point(280, 34);
+            _labelVolume.Location = new Point(272, 34);
             _labelVolume.Name = "_labelVolume";
             _labelVolume.Size = new Size(80, 15);
             _labelVolume.TabIndex = 2;
             _labelVolume.Text = "current volme";
             _labelVolume.TextAlign = ContentAlignment.MiddleCenter;
             // 
+            // _buttonRemove
+            // 
+            _buttonRemove.FlatAppearance.BorderSize = 0;
+            _buttonRemove.FlatStyle = FlatStyle.Flat;
+            _buttonRemove.Image = Properties.Resources.garbage;
+            _buttonRemove.Location = new Point(379, 3);
+            _buttonRemove.Name = "_buttonRemove";
+            _buttonRemove.Size = new Size(18, 18);
+            _buttonRemove.TabIndex = 7;
+            _buttonRemove.UseVisualStyleBackColor = true;
+            _buttonRemove.Click += _buttonRemove_Click;
+            // 
             // AppVolumeSettingsControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BorderStyle = BorderStyle.FixedSingle;
+            Controls.Add(_buttonRemove);
             Controls.Add(_labelVolume);
             Controls.Add(_labelAppName);
             Controls.Add(_labelProcessName);
             Controls.Add(_trackBar);
+            Margin = new Padding(0);
             Name = "AppVolumeSettingsControl";
             Size = new Size(400, 51);
             ((System.ComponentModel.ISupportInitialize)_trackBar).EndInit();
@@ -92,5 +108,6 @@
         private Label _labelProcessName;
         private Label _labelAppName;
         private Label _labelVolume;
+        private Button _buttonRemove;
     }
 }
