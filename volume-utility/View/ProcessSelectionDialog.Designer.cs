@@ -111,6 +111,7 @@
             Controls.Add(_buttonOk);
             FormBorderStyle = FormBorderStyle.None;
             Name = "ProcessSelectionDialog";
+            ShowInTaskbar = false;
             Text = "ProcessSelectionDialog";
             TopMost = true;
             ResumeLayout(false);

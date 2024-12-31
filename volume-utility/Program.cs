@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace volume_utility
 {
     internal static class Program
@@ -11,7 +13,14 @@ namespace volume_utility
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             Application.Run(new Main());
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Debug.WriteLine(e);
         }
     }
 }

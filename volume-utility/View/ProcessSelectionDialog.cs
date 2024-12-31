@@ -11,9 +11,17 @@ namespace volume_utility.View
         private Draggable _draggable;
 
         /// <summary>
-        /// 選択されたプロセス
+        /// プロセスID
         /// </summary>
-        public Process? SelectedProcess { get; private set; }
+        public int ProcessId { get; private set; }
+        /// <summary>
+        /// プロセス名
+        /// </summary>
+        public string ProcessName { get; private set; } = string.Empty;
+        /// <summary>
+        /// 製品名
+        /// </summary>
+        public string ApplicationName { get; private set; } = string.Empty;
 
         /// <summary>
         /// コンストラクタ
@@ -48,16 +56,19 @@ namespace volume_utility.View
             // フォアグラウンドウィンドウを持つプロセスのみをリストに追加
             foreach (Process p in processes.Where(p=>p.MainWindowHandle != IntPtr.Zero))
             {
-                try
+                using (p)
                 {
-                    ListViewItem item = new ListViewItem(p.Id.ToString());
-                    item.SubItems.Add(p.ProcessName);
-                    item.SubItems.Add(p.MainModule?.FileVersionInfo.ProductName);
-                    _listView.Items.Add(item);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"エラー: {ex.Message} {ex} ");
+                    try
+                    {
+                        ListViewItem item = new ListViewItem(p.Id.ToString());
+                        item.SubItems.Add(p.ProcessName);
+                        item.SubItems.Add(p.MainModule?.FileVersionInfo.ProductName);
+                        _listView.Items.Add(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"エラー: {ex.Message} {ex} ");
+                    }
                 }
             }
         }
@@ -81,7 +92,10 @@ namespace volume_utility.View
         {
             try
             {
-                SelectedProcess = Process.GetProcessById(int.Parse(_listView.SelectedItems[0].SubItems[0].Text));
+                ProcessId = int.Parse(_listView.SelectedItems[0].SubItems[0].Text);
+                ProcessName = _listView.SelectedItems[0].SubItems[1].Text;
+                ApplicationName = _listView.SelectedItems[0].SubItems[2].Text;
+
                 DialogResult = DialogResult.OK;
                 Close();
             }

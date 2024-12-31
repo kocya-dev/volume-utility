@@ -1,8 +1,8 @@
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
-using System.Windows.Forms;
 using volume_utility.Controller;
 using volume_utility.Properties;
+using volume_utility.UserControls;
 using volume_utility.Utils;
 using volume_utility.View;
 
@@ -14,6 +14,10 @@ namespace volume_utility
         /// ボリューム操作クラス
         /// </summary>
         private VolumeController _volumeController;
+        /// <summary>
+        /// アプリケーションごとのボリューム設定
+        /// </summary>
+        private ApplicationVolumeSettings _appVolumeSettings = new ApplicationVolumeSettings();
         /// <summary>
         /// UI更新用のコンテキスト
         /// </summary>
@@ -37,7 +41,7 @@ namespace volume_utility
 
             NativeMethods.EnableRoundWindowStyle(Handle);
 
-            _draggable = new Draggable(this);
+            _draggable = new Draggable(_panel, this);
             _volumeController = new VolumeController(VolumeChangedCallback);
 
             LoadSettings();
@@ -58,6 +62,7 @@ namespace volume_utility
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
             UpdateWindowVisibility();
+            _appVolumeSettings.VolumeSettings.ForEach(AddAppSettingControl);
             NativeMethods.StartHook(Handle);
             base.OnLoad(e);
         }
@@ -99,9 +104,28 @@ namespace volume_utility
             {
                 Debug.WriteLine($"WndProc: {m.Msg} {m.WParam} {m.LParam}");
                 Process? p = NativeMethods.getProcess(m.LParam);
-                if (p != null)
+                if (p != null && p.ProcessName != Process.GetCurrentProcess().ProcessName)
                 {
-                    Debug.WriteLine($"{p.ProcessName} {p.MainModule?.FileVersionInfo.ProductName}");//アプリケーションの名前が出てきます
+                    Debug.WriteLine($"Setting: {p.ProcessName} {p.MainModule?.FileVersionInfo.ProductName}");
+                    // ウィンドウ切り替えに伴うボリューム更新
+                    var setting = _appVolumeSettings.Find(p.ProcessName, p.MainModule?.FileVersionInfo.ProductName ?? string.Empty);
+                    _volumeController.CurrentVolume = (setting != null)
+                        ? setting.Volume // アクティブなプロセスに対応する設定が存在していればボリュームを適用する
+                        : _trackBarVolume.Value; // アクティブなプロセスに対応する設定が存在していなければマスターボリュームを適用する
+
+                    // 設定の選択状態を更新する
+                    foreach (var contrl in _flowLayoutPanelSettings.Controls)
+                    {
+                        AppVolumeSettingsControl? c = contrl as AppVolumeSettingsControl;
+                        if (c != null)
+                        {
+                            c.IsActive = (setting != null) 
+                                && c.Setting.ProcessName == setting.ProcessName 
+                                && c.Setting.ApplicationName == setting.ApplicationName;
+                        }
+                    }
+                    // マスターボリューム設定有効状態の更新
+                    _trackBarVolume.Enabled = setting == null;
                 }
             }
             base.WndProc(ref m);
@@ -132,27 +156,22 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// トラックバーのUI更新中かどうか
-        /// </summary>
-        private bool isChagingVolume = false;
-        /// <summary>
         /// トラックバーの値変更時の処理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _trackBarVolume_ValueChanged(object sender, EventArgs e)
         {
-            if (isChagingVolume) return;
-
-            isChagingVolume = true;
+            if (_volumeController.IsChanging) return;
             float nextValue = _volumeController.GetNextVolume(_trackBarVolume.Value);
             if ((int)nextValue != _trackBarVolume.Value)
             {
                 _trackBarVolume.Value = (int)nextValue;
+                return;
             }
-            Debug.WriteLine($"_trackBarVolume_ValueChanged: {_trackBarVolume.Value}, next: {nextValue}");
+            _labelCurrentVolume.Text = $"{_trackBarVolume.Value} / 100";
+            Debug.WriteLine($"_trackBarVolume_ValueChanged set: {_trackBarVolume.Value}, next: {nextValue}");
             _volumeController.CurrentVolume = nextValue;
-            isChagingVolume = false;
         }
         /// <summary>
         /// ボリューム変更時のコールバック
@@ -163,12 +182,22 @@ namespace volume_utility
         {
             _context?.Post((state) =>
             {
-                isChagingVolume = true;
+                _volumeController.IsChanging = true;
                 Debug.WriteLine($"VolumeChangedCallback next: {nextValue}, muted: {data.Muted}");
-                _trackBarVolume.Value = (int)nextValue;
-                UpdateCurrentVolumeText();
-                UpdateCurrentMuteStatus(data.Muted);
-                isChagingVolume = false;
+                var control = FindActiveSettingControl();
+                if (control != null)
+                {
+                    // アクティブな設定が存在する場合は設定を更新する
+                    control.UpdateVolume((int)nextValue);
+                }
+                else
+                {
+                    // アクティブな設定が存在しない場合はメインのトラックバーの値を更新する
+                    _trackBarVolume.Value = (int)nextValue;
+                    UpdateCurrentVolumeText();
+                    UpdateCurrentMuteStatus(data.Muted);
+                }
+                _volumeController.IsChanging = false;
             }, null);
         }
 
@@ -284,6 +313,7 @@ namespace volume_utility
             Opacity = Settings.Default.Opacity;
             _isWindowVisible = Settings.Default.Visible;
             _isStartup = Settings.Default.Startup;
+            _appVolumeSettings.Import(Settings.Default.AppSettings);
         }
 
         /// <summary>
@@ -296,6 +326,7 @@ namespace volume_utility
             Settings.Default.Opacity = Opacity;
             Settings.Default.Visible = _isWindowVisible;
             Settings.Default.Startup = _isStartup;
+            Settings.Default.AppSettings = _appVolumeSettings.Export();
             Settings.Default.Save();
         }
         /// <summary>
@@ -323,9 +354,56 @@ namespace volume_utility
                 dialog.Opacity = Opacity;
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    Debug.WriteLine($"Selected: {dialog.SelectedProcess?.ProcessName}");
+                    var setting = new VolumeSetting(dialog.ProcessName, dialog.ApplicationName, _trackBarVolume.Value);
+                    Debug.WriteLine($"{dialog.ProcessName} {dialog.ApplicationName}");
+                    _appVolumeSettings.Add(setting);
+                    AddAppSettingControl(setting);
                 }
             }
+        }
+        /// <summary>
+        /// アプリ設定コントロールを追加する
+        /// </summary>
+        /// <param name="setting"></param>
+
+        private void AddAppSettingControl(VolumeSetting setting)
+        {
+            AppVolumeSettingsControl control = new AppVolumeSettingsControl(_volumeController, setting);
+            control.RemoveRequested += Control_RemoveRequested;
+            _flowLayoutPanelSettings.Controls.Add(control);
+        }
+        /// <summary>
+        /// 設定コントロールの削除リクエスト時の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Control_RemoveRequested(object? sender, EventArgs e)
+        {
+            var control = sender as AppVolumeSettingsControl;
+            if (control != null)
+            {
+                control.RemoveRequested -= Control_RemoveRequested;
+                _flowLayoutPanelSettings.Controls.Remove(control);
+                _appVolumeSettings.Remove(control.Setting);
+            }
+        }
+
+        /// <summary>
+        /// アクティブな設定コントロールを検索する
+        /// </summary>
+        /// <returns></returns>
+        private AppVolumeSettingsControl? FindActiveSettingControl()
+        {
+            foreach (var contrl in _flowLayoutPanelSettings.Controls)
+            {
+                AppVolumeSettingsControl? c = contrl as AppVolumeSettingsControl;
+                if (c != null && c.IsActive)
+                {
+                    return c;
+                }
+            }
+            return null;
         }
 
         /// <summary>

@@ -44,15 +44,20 @@
             _buttonConfig = new Button();
             _notifyIcon = new NotifyIcon(components);
             _buttonAdd = new Button();
+            _flowLayoutPanelSettings = new FlowLayoutPanel();
+            _panel = new Panel();
+            _tableLayoutPanel = new TableLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)_trackBarVolume).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMin).BeginInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMax).BeginInit();
             _contextMenuStrip.SuspendLayout();
+            _panel.SuspendLayout();
+            _tableLayoutPanel.SuspendLayout();
             SuspendLayout();
             // 
             // _trackBarVolume
             // 
-            _trackBarVolume.Location = new Point(55, 12);
+            _trackBarVolume.Location = new Point(63, 10);
             _trackBarVolume.Maximum = 100;
             _trackBarVolume.Name = "_trackBarVolume";
             _trackBarVolume.Size = new Size(295, 45);
@@ -63,7 +68,7 @@
             // _labelCurrentVolume
             // 
             _labelCurrentVolume.AutoSize = true;
-            _labelCurrentVolume.Location = new Point(183, 42);
+            _labelCurrentVolume.Location = new Point(183, 40);
             _labelCurrentVolume.Name = "_labelCurrentVolume";
             _labelCurrentVolume.Size = new Size(88, 15);
             _labelCurrentVolume.TabIndex = 2;
@@ -72,7 +77,7 @@
             // 
             // _numericUpDownMin
             // 
-            _numericUpDownMin.Location = new Point(12, 12);
+            _numericUpDownMin.Location = new Point(12, 10);
             _numericUpDownMin.Name = "_numericUpDownMin";
             _numericUpDownMin.Size = new Size(40, 23);
             _numericUpDownMin.TabIndex = 0;
@@ -81,7 +86,7 @@
             // 
             // _numericUpDownMax
             // 
-            _numericUpDownMax.Location = new Point(356, 12);
+            _numericUpDownMax.Location = new Point(360, 10);
             _numericUpDownMax.Name = "_numericUpDownMax";
             _numericUpDownMax.Size = new Size(40, 23);
             _numericUpDownMax.TabIndex = 3;
@@ -92,7 +97,7 @@
             // _checkBoxMute
             // 
             _checkBoxMute.AutoSize = true;
-            _checkBoxMute.Location = new Point(12, 63);
+            _checkBoxMute.Location = new Point(12, 61);
             _checkBoxMute.Name = "_checkBoxMute";
             _checkBoxMute.Size = new Size(57, 19);
             _checkBoxMute.TabIndex = 4;
@@ -144,7 +149,7 @@
             _buttonConfig.FlatAppearance.BorderSize = 0;
             _buttonConfig.FlatStyle = FlatStyle.Flat;
             _buttonConfig.Image = Properties.Resources.config;
-            _buttonConfig.Location = new Point(364, 50);
+            _buttonConfig.Location = new Point(364, 48);
             _buttonConfig.Name = "_buttonConfig";
             _buttonConfig.Size = new Size(36, 36);
             _buttonConfig.TabIndex = 5;
@@ -164,27 +169,69 @@
             _buttonAdd.FlatAppearance.BorderSize = 0;
             _buttonAdd.FlatStyle = FlatStyle.Flat;
             _buttonAdd.Image = Properties.Resources.add;
-            _buttonAdd.Location = new Point(322, 50);
+            _buttonAdd.Location = new Point(322, 48);
             _buttonAdd.Name = "_buttonAdd";
             _buttonAdd.Size = new Size(36, 36);
             _buttonAdd.TabIndex = 6;
             _buttonAdd.UseVisualStyleBackColor = true;
             _buttonAdd.Click += _buttonAdd_Click;
             // 
+            // _flowLayoutPanelSettings
+            // 
+            _flowLayoutPanelSettings.AutoSize = true;
+            _flowLayoutPanelSettings.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            _flowLayoutPanelSettings.Dock = DockStyle.Fill;
+            _flowLayoutPanelSettings.FlowDirection = FlowDirection.TopDown;
+            _flowLayoutPanelSettings.Location = new Point(0, 92);
+            _flowLayoutPanelSettings.Margin = new Padding(0);
+            _flowLayoutPanelSettings.Name = "_flowLayoutPanelSettings";
+            _flowLayoutPanelSettings.Padding = new Padding(6, 3, 6, 6);
+            _flowLayoutPanelSettings.Size = new Size(412, 133);
+            _flowLayoutPanelSettings.TabIndex = 7;
+            // 
+            // _panel
+            // 
+            _panel.Controls.Add(_labelCurrentVolume);
+            _panel.Controls.Add(_buttonAdd);
+            _panel.Controls.Add(_buttonConfig);
+            _panel.Controls.Add(_trackBarVolume);
+            _panel.Controls.Add(_numericUpDownMin);
+            _panel.Controls.Add(_numericUpDownMax);
+            _panel.Controls.Add(_checkBoxMute);
+            _panel.Location = new Point(0, 0);
+            _panel.Margin = new Padding(0);
+            _panel.Name = "_panel";
+            _panel.Size = new Size(412, 92);
+            _panel.TabIndex = 8;
+            // 
+            // _tableLayoutPanel
+            // 
+            _tableLayoutPanel.AutoSize = true;
+            _tableLayoutPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            _tableLayoutPanel.ColumnCount = 1;
+            _tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            _tableLayoutPanel.Controls.Add(_flowLayoutPanelSettings, 0, 1);
+            _tableLayoutPanel.Controls.Add(_panel, 0, 0);
+            _tableLayoutPanel.Dock = DockStyle.Fill;
+            _tableLayoutPanel.Location = new Point(0, 0);
+            _tableLayoutPanel.Margin = new Padding(0);
+            _tableLayoutPanel.Name = "_tableLayoutPanel";
+            _tableLayoutPanel.RowCount = 2;
+            _tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 92F));
+            _tableLayoutPanel.RowStyles.Add(new RowStyle());
+            _tableLayoutPanel.Size = new Size(412, 225);
+            _tableLayoutPanel.TabIndex = 9;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoSize = true;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(412, 89);
+            ClientSize = new Size(412, 225);
             ContextMenuStrip = _contextMenuStrip;
-            Controls.Add(_buttonAdd);
-            Controls.Add(_buttonConfig);
-            Controls.Add(_checkBoxMute);
-            Controls.Add(_numericUpDownMax);
-            Controls.Add(_numericUpDownMin);
-            Controls.Add(_labelCurrentVolume);
-            Controls.Add(_trackBarVolume);
+            Controls.Add(_tableLayoutPanel);
             FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Main";
@@ -196,6 +243,10 @@
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMin).EndInit();
             ((System.ComponentModel.ISupportInitialize)_numericUpDownMax).EndInit();
             _contextMenuStrip.ResumeLayout(false);
+            _panel.ResumeLayout(false);
+            _panel.PerformLayout();
+            _tableLayoutPanel.ResumeLayout(false);
+            _tableLayoutPanel.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -216,5 +267,8 @@
         private ToolStripMenuItem _toolStripMenuItemVisible;
         private ToolStripMenuItem _toolStripMenuItemStartup;
         private Button _buttonAdd;
+        private FlowLayoutPanel _flowLayoutPanelSettings;
+        private Panel _panel;
+        private TableLayoutPanel _tableLayoutPanel;
     }
 }
