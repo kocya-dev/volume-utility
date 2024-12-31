@@ -25,7 +25,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: ビルド(NuGetパッケージ復元あり)
       run: |
-        msbuild ${{env.Solution_Name}} /t:Rebuild /p:Configuration=Release /p:RestorePackagesConfig=True /p:Platform=x64
+        msbuild ${{env.Solution_Name}} /t:Rebuild /p:Configuration=Release /p:RestorePackagesConfig=True
     - name: 一覧
       run: tree /f
     - name: ビルド結果のアップロード
