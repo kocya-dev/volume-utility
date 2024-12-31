@@ -15,8 +15,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
@@ -33,6 +31,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bin_Release
-        path: .\bin\Release
+        path: .volume-utility\bin\Release
 
 
