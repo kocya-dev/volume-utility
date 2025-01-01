@@ -162,7 +162,8 @@ namespace volume_utility
         /// <param name="e"></param>
         private void _trackBarVolume_ValueChanged(object sender, EventArgs e)
         {
-            if (_volumeController.IsChanging) return;
+            if (_volumeController.IsChanging) { return; }
+
             float nextValue = _volumeController.GetNextVolume(_trackBarVolume.Value);
             if ((int)nextValue != _trackBarVolume.Value)
             {

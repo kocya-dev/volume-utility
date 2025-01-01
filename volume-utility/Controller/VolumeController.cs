@@ -68,7 +68,7 @@ namespace volume_utility.Controller
         /// </summary>
         public void Dispose()
         {
-            if (_isDisposed) return;
+            if (_isDisposed) { return; }
 
             _isDisposed = true;
             _device.AudioEndpointVolume.OnVolumeNotification -= AudioEndpointVolume_OnVolumeNotification;

@@ -10,6 +10,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <Copyright>Copyright 2024 Kocya</Copyright>
     <ApplicationIcon>Resources\speaker_black.ico</ApplicationIcon>
+    <BaseOutputPath>D:\Project\_VisualStudio2022\volume-utility\x64</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

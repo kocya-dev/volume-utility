@@ -31,7 +31,7 @@ namespace volume_utility.UserControls
         /// <summary>
         /// 削除ボタンクリック時のイベント
         /// </summary>
-        public event EventHandler RemoveRequested = delegate { };
+        public event EventHandler? RemoveRequested;
 
         /// <summary>
         /// コンストラクタ(デザイナ用)
@@ -84,8 +84,8 @@ namespace volume_utility.UserControls
         /// <param name="e"></param>
         private void _trackBar_ValueChanged(object sender, EventArgs e)
         {
-            if (_controller == null) return;
-            if (_controller.IsChanging) return;
+            if (_controller == null) { return; }
+            if (_controller.IsChanging) { return; }
 
             float nextValue = _controller.GetNextVolume(_trackBar.Value);
             if ((int)nextValue != _trackBar.Value)
@@ -107,7 +107,7 @@ namespace volume_utility.UserControls
         /// <param name="e"></param>
         private void _buttonRemove_Click(object sender, EventArgs e)
         {
-            RemoveRequested(this, EventArgs.Empty);
+            RemoveRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 }
