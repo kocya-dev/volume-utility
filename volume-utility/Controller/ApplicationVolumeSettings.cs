@@ -9,7 +9,7 @@ namespace volume_utility.Controller
     {
         public List<VolumeSetting> VolumeSettings { get; private set; } =  new List<VolumeSetting>();
 
-        public ApplicationVolumeSettings()
+        // Remove the constructor
         {
 
         }
