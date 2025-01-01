@@ -107,7 +107,8 @@ namespace volume_utility.UserControls
         /// <param name="e"></param>
         private void _buttonRemove_Click(object sender, EventArgs e)
         {
-            RemoveRequested?.Invoke(this, EventArgs.Empty);
+            var eventHandler = RemoveRequested;
+            eventHandler?.Invoke(this, EventArgs.Empty);
         }
     }
 }
