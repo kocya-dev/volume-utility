@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: windows-latest 
     env:
-      Solution_Name: volume-utility.sln
+      SolutionName: volume-utility.sln
 
     steps:
     - name: Checkout
@@ -24,13 +24,14 @@ jobs:
     - name: ビルド(NuGetパッケージ復元あり)
       run: |
         msbuild -t:restore
-        msbuild ${{env.Solution_Name}} /t:Rebuild /p:Configuration=Release /p:RestorePackagesConfig=True
+        msbuild ${{env.SolutionName}} /t:Rebuild /p:Configuration=Release /p:RestorePackagesConfig=True
     - name: 一覧
       run: tree /f
     - name: ビルド結果のアップロード
       uses: actions/upload-artifact@v4
       with:
         name: bin_Release
-        path: .volume-utility\bin\Release
+        path: .\x64\Release\net8.0-windows7.0
+
 
 
