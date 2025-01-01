@@ -8,7 +8,7 @@ namespace volume_utility.View
         /// <summary>
         /// ドラッグ可能クラス
         /// </summary>
-        private Draggable _draggable;
+        private readonly Draggable _draggable;
 
         /// <summary>
         /// プロセスID
