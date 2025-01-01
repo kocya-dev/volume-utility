@@ -1,8 +1,8 @@
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
-using System.Windows.Forms;
 using volume_utility.Controller;
 using volume_utility.Properties;
+using volume_utility.UserControls;
 using volume_utility.Utils;
 using volume_utility.View;
 
@@ -11,23 +11,27 @@ namespace volume_utility
     public partial class Main : Form
     {
         /// <summary>
-        /// ƒ{ƒŠƒ…[ƒ€‘€ìƒNƒ‰ƒX
+        /// ãƒœãƒªãƒ¥ãƒ¼ãƒ æ“ä½œã‚¯ãƒ©ã‚¹
         /// </summary>
         private VolumeController _volumeController;
         /// <summary>
-        /// UIXV—p‚ÌƒRƒ“ƒeƒLƒXƒg
+        /// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã”ã¨ã®ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®š
+        /// </summary>
+        private readonly ApplicationVolumeSettings _appVolumeSettings = new ApplicationVolumeSettings();
+        /// <summary>
+        /// UIæ›´æ–°ç”¨ã®ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
         /// </summary>
         private SynchronizationContext? _context = null;
         /// <summary>
-        /// ƒhƒ‰ƒbƒO‰Â”\ƒNƒ‰ƒX
+        /// ãƒ‰ãƒ©ãƒƒã‚°å¯èƒ½ã‚¯ãƒ©ã‚¹
         /// </summary>
         private Draggable _draggable;
         /// <summary>
-        /// ƒEƒBƒ“ƒhƒE‚Ì•\¦ó‘Ô
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºçŠ¶æ…‹
         /// </summary>
         private bool _isWindowVisible = false;
         /// <summary>
-        /// ƒXƒ^[ƒgƒAƒbƒvƒtƒ‰ƒO
+        /// ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—ãƒ•ãƒ©ã‚°
         /// </summary>
         private bool _isStartup = false;
 
@@ -37,20 +41,20 @@ namespace volume_utility
 
             NativeMethods.EnableRoundWindowStyle(Handle);
 
-            _draggable = new Draggable(this);
+            _draggable = new Draggable(_panel, this);
             _volumeController = new VolumeController(VolumeChangedCallback);
 
             LoadSettings();
         }
         /// <summary>
-        /// ƒtƒH[ƒ€ƒ[ƒh‚Ìˆ—
+        /// ãƒ•ã‚©ãƒ¼ãƒ ãƒ­ãƒ¼ãƒ‰æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
             Debug.Assert(SynchronizationContext.Current != null);
 
-            // UI‚ÉŠÖ‚í‚éî•ñ‚ğXV
+            // UIã«é–¢ã‚ã‚‹æƒ…å ±ã‚’æ›´æ–°
             _context = SynchronizationContext.Current;
             _trackBarVolume.Value = (int)_volumeController.CurrentVolume;
             _toolStripMenuItemVisible.Checked = _isWindowVisible;
@@ -58,15 +62,18 @@ namespace volume_utility
             UpdateCurrentMuteStatus(_volumeController.IsMute);
             UpdateCurrentVolumeText();
             UpdateWindowVisibility();
+            _appVolumeSettings.VolumeSettings.ForEach(AddAppSettingControl);
+            NativeMethods.StartHook(Handle);
             base.OnLoad(e);
         }
 
         /// <summary>
-        /// ƒtƒH[ƒ€ƒNƒ[ƒYŒã‚Ìˆ—
+        /// ãƒ•ã‚©ãƒ¼ãƒ ã‚¯ãƒ­ãƒ¼ã‚ºå¾Œã®å‡¦ç†
         /// </summary>
         /// <param name="e"></param>
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            NativeMethods.EndHook();
             SaveSettings();
 
             _volumeController.Dispose();
@@ -75,7 +82,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// ƒtƒH[ƒ€ƒŠƒTƒCƒY‚Ìˆ—
+        /// ãƒ•ã‚©ãƒ¼ãƒ ãƒªã‚µã‚¤ã‚ºæ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="e"></param>
         protected override void OnResize(EventArgs e)
@@ -88,7 +95,44 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// Å¬’lƒRƒ“ƒgƒ[ƒ‹‚Ì’l•ÏX‚Ìˆ—
+        /// ãƒ•ã‚©ãƒ¼ãƒ ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_HOOK_ACTIVATE)
+            {
+                Debug.WriteLine($"WndProc: {m.Msg} {m.WParam} {m.LParam}");
+                Process? p = NativeMethods.getProcess(m.LParam);
+                if (p != null && p.ProcessName != Process.GetCurrentProcess().ProcessName)
+                {
+                    Debug.WriteLine($"Setting: {p.ProcessName} {p.MainModule?.FileVersionInfo.ProductName}");
+                    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦åˆ‡ã‚Šæ›¿ãˆã«ä¼´ã†ãƒœãƒªãƒ¥ãƒ¼ãƒ æ›´æ–°
+                    var setting = _appVolumeSettings.Find(p.ProcessName, p.MainModule?.FileVersionInfo.ProductName ?? string.Empty);
+                    _volumeController.CurrentVolume = (setting != null)
+                        ? setting.Volume // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªãƒ—ãƒ­ã‚»ã‚¹ã«å¯¾å¿œã™ã‚‹è¨­å®šãŒå­˜åœ¨ã—ã¦ã„ã‚Œã°ãƒœãƒªãƒ¥ãƒ¼ãƒ ã‚’é©ç”¨ã™ã‚‹
+                        : _trackBarVolume.Value; // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªãƒ—ãƒ­ã‚»ã‚¹ã«å¯¾å¿œã™ã‚‹è¨­å®šãŒå­˜åœ¨ã—ã¦ã„ãªã‘ã‚Œã°ãƒã‚¹ã‚¿ãƒ¼ãƒœãƒªãƒ¥ãƒ¼ãƒ ã‚’é©ç”¨ã™ã‚‹
+
+                    // è¨­å®šã®é¸æŠçŠ¶æ…‹ã‚’æ›´æ–°ã™ã‚‹
+                    foreach (var contrl in _flowLayoutPanelSettings.Controls)
+                    {
+                        AppVolumeSettingsControl? c = contrl as AppVolumeSettingsControl;
+                        if (c != null)
+                        {
+                            c.IsActive = (setting != null) 
+                                && c.Setting.ProcessName == setting.ProcessName 
+                                && c.Setting.ApplicationName == setting.ApplicationName;
+                        }
+                    }
+                    // ãƒã‚¹ã‚¿ãƒ¼ãƒœãƒªãƒ¥ãƒ¼ãƒ è¨­å®šæœ‰åŠ¹çŠ¶æ…‹ã®æ›´æ–°
+                    _trackBarVolume.Enabled = setting == null;
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        /// <summary>
+        /// æœ€å°å€¤ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å€¤å¤‰æ›´æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -100,7 +144,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// Å‘å’lƒRƒ“ƒgƒ[ƒ‹‚Ì’l•ÏX‚Ìˆ—
+        /// æœ€å¤§å€¤ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å€¤å¤‰æ›´æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -112,30 +156,26 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// ƒgƒ‰ƒbƒNƒo[‚ÌUIXV’†‚©‚Ç‚¤‚©
-        /// </summary>
-        private bool isChagingVolume = false;
-        /// <summary>
-        /// ƒgƒ‰ƒbƒNƒo[‚Ì’l•ÏX‚Ìˆ—
+        /// ãƒˆãƒ©ãƒƒã‚¯ãƒãƒ¼ã®å€¤å¤‰æ›´æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _trackBarVolume_ValueChanged(object sender, EventArgs e)
         {
-            if (isChagingVolume) return;
+            if (_volumeController.IsChanging) { return; }
 
-            isChagingVolume = true;
             float nextValue = _volumeController.GetNextVolume(_trackBarVolume.Value);
             if ((int)nextValue != _trackBarVolume.Value)
             {
                 _trackBarVolume.Value = (int)nextValue;
+                return;
             }
-            Debug.WriteLine($"_trackBarVolume_ValueChanged: {_trackBarVolume.Value}, next: {nextValue}");
+            _labelCurrentVolume.Text = $"{_trackBarVolume.Value} / 100";
+            Debug.WriteLine($"_trackBarVolume_ValueChanged set: {_trackBarVolume.Value}, next: {nextValue}");
             _volumeController.CurrentVolume = nextValue;
-            isChagingVolume = false;
         }
         /// <summary>
-        /// ƒ{ƒŠƒ…[ƒ€•ÏX‚ÌƒR[ƒ‹ƒoƒbƒN
+        /// ãƒœãƒªãƒ¥ãƒ¼ãƒ å¤‰æ›´æ™‚ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯
         /// </summary>
         /// <param name="nextValue"></param>
         /// <param name="data"></param>
@@ -143,17 +183,27 @@ namespace volume_utility
         {
             _context?.Post((state) =>
             {
-                isChagingVolume = true;
+                _volumeController.IsChanging = true;
                 Debug.WriteLine($"VolumeChangedCallback next: {nextValue}, muted: {data.Muted}");
-                _trackBarVolume.Value = (int)nextValue;
-                UpdateCurrentVolumeText();
-                UpdateCurrentMuteStatus(data.Muted);
-                isChagingVolume = false;
+                var control = FindActiveSettingControl();
+                if (control != null)
+                {
+                    // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªè¨­å®šãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯è¨­å®šã‚’æ›´æ–°ã™ã‚‹
+                    control.UpdateVolume((int)nextValue);
+                }
+                else
+                {
+                    // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªè¨­å®šãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ãƒ¡ã‚¤ãƒ³ã®ãƒˆãƒ©ãƒƒã‚¯ãƒãƒ¼ã®å€¤ã‚’æ›´æ–°ã™ã‚‹
+                    _trackBarVolume.Value = (int)nextValue;
+                    UpdateCurrentVolumeText();
+                    UpdateCurrentMuteStatus(data.Muted);
+                }
+                _volumeController.IsChanging = false;
             }, null);
         }
 
         /// <summary>
-        /// ƒ~ƒ…[ƒgƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚Ì’l•ÏX‚Ìˆ—
+        /// ãƒŸãƒ¥ãƒ¼ãƒˆãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã®å€¤å¤‰æ›´æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -163,7 +213,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// I—¹ƒƒjƒ…[‚ÌƒNƒŠƒbƒN‚Ìˆ—
+        /// çµ‚äº†ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -173,7 +223,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// Œ»İ‚Ìƒ{ƒŠƒ…[ƒ€ƒeƒLƒXƒg‚ğXV‚·‚é
+        /// ç¾åœ¨ã®ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒ†ã‚­ã‚¹ãƒˆã‚’æ›´æ–°ã™ã‚‹
         /// </summary>
         private void UpdateCurrentVolumeText()
         {
@@ -181,7 +231,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// Œ»İ‚Ìƒ~ƒ…[ƒgó‘Ô•\¦‚ğXV‚·‚é
+        /// ç¾åœ¨ã®ãƒŸãƒ¥ãƒ¼ãƒˆçŠ¶æ…‹è¡¨ç¤ºã‚’æ›´æ–°ã™ã‚‹
         /// </summary>
         /// <param name="isMute"></param>
         private void UpdateCurrentMuteStatus(bool isMute)
@@ -190,7 +240,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// İ’èƒƒjƒ…[‚ÌƒNƒŠƒbƒN‚Ìˆ—
+        /// è¨­å®šãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -200,7 +250,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// •\¦ƒƒjƒ…[‚ÌƒNƒŠƒbƒN‚Ìˆ—
+        /// è¡¨ç¤ºãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -211,7 +261,7 @@ namespace volume_utility
             UpdateWindowVisibility();
         }
         /// <summary>
-        /// ƒXƒ^[ƒgƒAƒbƒvƒƒjƒ…[‚ÌƒNƒŠƒbƒN‚Ìˆ—
+        /// ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã®ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -223,7 +273,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// İ’èƒ{ƒ^ƒ“ƒNƒŠƒbƒN‚Ìˆ—
+        /// è¨­å®šãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -232,7 +282,17 @@ namespace volume_utility
             OpenConfigDialog();
         }
         /// <summary>
-        /// ’Ê’mƒAƒCƒRƒ“‚Ìƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Ìˆ—
+        /// è¿½åŠ ãƒœã‚¿ãƒ³ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _buttonAdd_Click(object sender, EventArgs e)
+        {
+            OpenAddAppDialog();
+        }
+
+        /// <summary>
+        /// é€šçŸ¥ã‚¢ã‚¤ã‚³ãƒ³ã®ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯æ™‚ã®å‡¦ç†
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -243,7 +303,7 @@ namespace volume_utility
             UpdateWindowVisibility();
         }
         /// <summary>
-        /// İ’è‚Ì“Ç‚İ‚İ
+        /// è¨­å®šã®èª­ã¿è¾¼ã¿
         /// </summary>
         private void LoadSettings()
         {
@@ -254,10 +314,11 @@ namespace volume_utility
             Opacity = Settings.Default.Opacity;
             _isWindowVisible = Settings.Default.Visible;
             _isStartup = Settings.Default.Startup;
+            _appVolumeSettings.Import(Settings.Default.AppSettings);
         }
 
         /// <summary>
-        /// İ’è‚Ì•Û‘¶
+        /// è¨­å®šã®ä¿å­˜
         /// </summary>
         private void SaveSettings()
         {
@@ -266,10 +327,11 @@ namespace volume_utility
             Settings.Default.Opacity = Opacity;
             Settings.Default.Visible = _isWindowVisible;
             Settings.Default.Startup = _isStartup;
+            Settings.Default.AppSettings = _appVolumeSettings.Export();
             Settings.Default.Save();
         }
         /// <summary>
-        /// İ’èƒ_ƒCƒAƒƒO‚ğŠJ‚­
+        /// è¨­å®šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
         /// </summary>
         private void OpenConfigDialog()
         {
@@ -282,9 +344,71 @@ namespace volume_utility
                 }
             }
         }
+        /// <summary>
+        /// ã‚¢ãƒ—ãƒªè¿½åŠ ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ã
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        private void OpenAddAppDialog()
+        {
+            using (var dialog = new ProcessSelectionDialog())
+            {
+                dialog.Opacity = Opacity;
+                if (dialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    var setting = new VolumeSetting(dialog.ProcessName, dialog.ApplicationName, _trackBarVolume.Value);
+                    Debug.WriteLine($"{dialog.ProcessName} {dialog.ApplicationName}");
+                    _appVolumeSettings.Add(setting);
+                    AddAppSettingControl(setting);
+                }
+            }
+        }
+        /// <summary>
+        /// ã‚¢ãƒ—ãƒªè¨­å®šã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’è¿½åŠ ã™ã‚‹
+        /// </summary>
+        /// <param name="setting"></param>
+
+        private void AddAppSettingControl(VolumeSetting setting)
+        {
+            AppVolumeSettingsControl control = new AppVolumeSettingsControl(_volumeController, setting);
+            control.RemoveRequested += Control_RemoveRequested;
+            _flowLayoutPanelSettings.Controls.Add(control);
+        }
+        /// <summary>
+        /// è¨­å®šã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®å‰Šé™¤ãƒªã‚¯ã‚¨ã‚¹ãƒˆæ™‚ã®å‡¦ç†
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Control_RemoveRequested(object? sender, EventArgs e)
+        {
+            var control = sender as AppVolumeSettingsControl;
+            if (control != null)
+            {
+                control.RemoveRequested -= Control_RemoveRequested;
+                _flowLayoutPanelSettings.Controls.Remove(control);
+                _appVolumeSettings.Remove(control.Setting);
+            }
+        }
 
         /// <summary>
-        /// ƒEƒBƒ“ƒhƒE‚Ì•\¦ó‘Ô‚ğXV‚·‚é
+        /// ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªè¨­å®šã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‚’æ¤œç´¢ã™ã‚‹
+        /// </summary>
+        /// <returns></returns>
+        private AppVolumeSettingsControl? FindActiveSettingControl()
+        {
+            foreach (var contrl in _flowLayoutPanelSettings.Controls)
+            {
+                AppVolumeSettingsControl? c = contrl as AppVolumeSettingsControl;
+                if (c != null && c.IsActive)
+                {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¡¨ç¤ºçŠ¶æ…‹ã‚’æ›´æ–°ã™ã‚‹
         /// </summary>
         private void UpdateWindowVisibility()
         {
@@ -301,7 +425,7 @@ namespace volume_utility
         }
 
         /// <summary>
-        /// ƒXƒ^[ƒgƒAƒbƒvƒVƒ‡[ƒgƒJƒbƒg‚ÌXV
+        /// ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã®æ›´æ–°
         /// </summary>
         private void UpdateStartupShortcut()
         {
@@ -314,7 +438,5 @@ namespace volume_utility
                 StartupUtility.Delete();
             }
         }
-
-
     }
 }

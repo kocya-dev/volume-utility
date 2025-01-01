@@ -1,19 +1,16 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace volume_utility.Utils
 {
     internal class NativeMethods
     {
-        // The enum flag for DwmSetWindowAttribute's second parameter, which tells the function what attribute to set.
-        // Copied from dwmapi.h
         public enum DWMWINDOWATTRIBUTE
         {
             DWMWA_WINDOW_CORNER_PREFERENCE = 33
         }
 
-        // The DWM_WINDOW_CORNER_PREFERENCE enum for DwmSetWindowAttribute's third parameter, which tells the function
-        // what value of the enum to set.
-        // Copied from dwmapi.h
         public enum DWM_WINDOW_CORNER_PREFERENCE
         {
             DWMWCP_DEFAULT = 0,
@@ -22,7 +19,6 @@ namespace volume_utility.Utils
             DWMWCP_ROUNDSMALL = 3
         }
 
-        // Import dwmapi.dll and define DwmSetWindowAttribute in C# corresponding to the native function.
         [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
         internal static extern void DwmSetWindowAttribute(IntPtr hwnd,
                                                          DWMWINDOWATTRIBUTE attribute,
@@ -34,10 +30,45 @@ namespace volume_utility.Utils
         /// <param name="handle"></param>
         internal static void EnableRoundWindowStyle(nint handle)
         {
-            var attribute = NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
-            var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-            NativeMethods.DwmSetWindowAttribute(handle, attribute, ref preference, sizeof(uint));
+            var attribute = DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE;
+            var preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+            DwmSetWindowAttribute(handle, attribute, ref preference, sizeof(uint));
+        }
 
+        /// <summary>
+        /// カスタムフックイベント
+        /// </summary>
+        internal const uint WM_HOOK_ACTIVATE = 0x8001;
+
+        [DllImport(@".\EventHookModule.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+        internal static extern bool StartHook(IntPtr hWnd);
+
+        [DllImport(@".\EventHookModule.dll", CharSet = CharSet.Unicode, CallingConvention =CallingConvention.StdCall)]
+        internal static extern bool EndHook();
+
+        [DllImport("user32.dll")]
+        internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
+        /// <summary>
+        /// ウィンドウハンドルからプロセス名を取得する
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        internal static Process? getProcess(IntPtr hWnd)
+        {
+            try
+            {
+                GetWindowThreadProcessId(hWnd, out int processId);
+                if (processId != 0)
+                {
+                    return Process.GetProcessById(processId);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            return null;
         }
     }
 }

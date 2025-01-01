@@ -8,7 +8,11 @@
         /// <summary>
         /// 操作対象のコントロール
         /// </summary>
-        private Control _control;
+        private Control _operationControl;
+        /// <summary>
+        /// 移動対象のコントロール
+        /// </summary>
+        private readonly Control _moveTargetControl;
         /// <summary>
         /// マウスの位置
         /// </summary>
@@ -19,12 +23,14 @@
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="control"></param>
-        public Draggable(Control control)
+        /// <param name="operationControl"></param>
+        /// <param name="moveTargetControl"></param>
+        public Draggable(Control operationControl, Control? moveTargetControl = null)
         {
-            _control = control;
-            _control.MouseDown += _control_MouseDown;
-            _control.MouseMove += _control_MouseMove;
+            _operationControl = operationControl;
+            _moveTargetControl = moveTargetControl ?? operationControl;
+            _operationControl.MouseDown += _control_MouseDown;
+            _operationControl.MouseMove += _control_MouseMove;
         }
         /// <summary>
         /// 解放処理
@@ -34,8 +40,8 @@
             if (_disposed) return;
 
             _disposed = true;
-            _control.MouseDown -= _control_MouseDown;
-            _control.MouseMove -= _control_MouseMove;
+            _operationControl.MouseDown -= _control_MouseDown;
+            _operationControl.MouseMove -= _control_MouseMove;
         }
         /// <summary>
         /// マウスダウン時の処理
@@ -58,8 +64,8 @@
         {
             if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
             {
-                _control.Left += e.X - _mousePoint.X;
-                _control.Top += e.Y - _mousePoint.Y;
+                _moveTargetControl.Left += e.X - _mousePoint.X;
+                _moveTargetControl.Top += e.Y - _mousePoint.Y;
             }
         }
 

@@ -6,7 +6,7 @@ namespace volume_utility.Controller
     /// <summary>
     /// ボリューム操作クラス
     /// </summary>
-    internal class VolumeController : IDisposable
+    public class VolumeController : IDisposable
     {
         private MMDeviceEnumerator _deviceEnumerator;
         private MMDevice _device;
@@ -19,6 +19,10 @@ namespace volume_utility.Controller
         /// </summary>
         private Action<float, AudioVolumeNotificationData> _volumeChangedCallback;
 
+        /// <summary>
+        /// ボリューム変更中かどうか
+        /// </summary>
+        public bool IsChanging { get; set; }
         /// <summary>
         /// 最小値
         /// </summary>
@@ -33,7 +37,12 @@ namespace volume_utility.Controller
         public float CurrentVolume
         {
             get { return (int)ConvertToTrackBarValue(_device.AudioEndpointVolume.MasterVolumeLevelScalar); }
-            set { _device.AudioEndpointVolume.MasterVolumeLevelScalar = ConvertoVolumeValue(value); }
+            set
+            {
+                IsChanging = true;
+                _device.AudioEndpointVolume.MasterVolumeLevelScalar = ConvertoVolumeValue(value);
+                IsChanging = false;
+            }
         }
         /// <summary>
         /// ミュート状態
@@ -59,7 +68,7 @@ namespace volume_utility.Controller
         /// </summary>
         public void Dispose()
         {
-            if (_isDisposed) return;
+            if (_isDisposed) { return; }
 
             _isDisposed = true;
             _device.AudioEndpointVolume.OnVolumeNotification -= AudioEndpointVolume_OnVolumeNotification;
@@ -85,9 +94,9 @@ namespace volume_utility.Controller
             int limitedVolume = (int)GetNextVolume(notificationVolume);
             int current = (int)CurrentVolume;
 
-            Debug.WriteLine($"MasterVolume: {notificationVolume}, limitedValue: {limitedVolume}, current: {current}");
             if (current != limitedVolume)
             {
+                Debug.WriteLine($"MasterVolume: {notificationVolume}, limitedValue: {limitedVolume}, current: {current}");
                 CurrentVolume = limitedVolume;
             }
             _volumeChangedCallback(limitedVolume, data);
@@ -102,7 +111,7 @@ namespace volume_utility.Controller
         /// <returns></returns>
         private static float ConvertToTrackBarValue(float value)
         {
-            return value * 100;
+            return (float)Math.Round(value * 100);
         }
         /// <summary>
         /// NAudioのボリュームをトラックバーの値に変換する
