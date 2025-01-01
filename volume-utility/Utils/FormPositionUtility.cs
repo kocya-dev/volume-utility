@@ -1,6 +1,6 @@
 ﻿namespace volume_utility.Utils
 {
-    internal class FormPositionUtility
+    internal static class FormPositionUtility
     {
         public static Point AdjustWindowPosition(Form? owner, Form current)
         {
