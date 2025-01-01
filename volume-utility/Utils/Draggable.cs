@@ -12,7 +12,7 @@
         /// <summary>
         /// 移動対象のコントロール
         /// </summary>
-        private Control _moveTargetControl;
+        private readonly Control _moveTargetControl;
         /// <summary>
         /// マウスの位置
         /// </summary>
