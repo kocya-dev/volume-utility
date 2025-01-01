@@ -9,10 +9,6 @@ namespace volume_utility.Controller
     {
         public List<VolumeSetting> VolumeSettings { get; private set; } =  new List<VolumeSetting>();
 
-        // Remove the constructor
-        {
-
-        }
         /// <summary>
         /// ボリューム設定を追加する
         /// </summary>
