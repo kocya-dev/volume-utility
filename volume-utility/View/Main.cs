@@ -5,6 +5,8 @@ using volume_utility.Properties;
 using volume_utility.UserControls;
 using volume_utility.Utils;
 using volume_utility.View;
+using System.Resources;
+using System.Globalization;
 
 namespace volume_utility
 {
@@ -215,7 +217,7 @@ namespace volume_utility
         /// <summary>
         /// 終了メニューのクリック時の処理
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param="sender"></param>
         /// <param name="e"></param>
         private void _toolStripMenuItemExit_Click(object sender, EventArgs e)
         {
