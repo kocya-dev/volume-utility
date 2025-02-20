@@ -15,7 +15,7 @@ namespace volume_utility
         /// <summary>
         /// ボリューム操作クラス
         /// </summary>
-        private VolumeController _volumeController;
+        private readonly VolumeController _volumeController;
         /// <summary>
         /// アプリケーションごとのボリューム設定
         /// </summary>
