@@ -134,54 +134,54 @@
     <value>..\Resources\speaker_white.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="labelCurrentVolume.Text" xml:space="preserve">
-    <value>Current Volume</value>
+    <value>現在のボリューム</value>
   </data>
   <data name="checkBoxMute.Text" xml:space="preserve">
-    <value>Mute</value>
+    <value>ミュート</value>
   </data>
   <data name="toolStripMenuItemVisible.Text" xml:space="preserve">
-    <value>Always Visible</value>
+    <value>常に表示</value>
   </data>
   <data name="toolStripMenuItemStartup.Text" xml:space="preserve">
-    <value>Start at Startup</value>
+    <value>スタートアップ時に起動する</value>
   </data>
   <data name="toolStripMenuItemConfig.Text" xml:space="preserve">
-    <value>Settings</value>
+    <value>設定</value>
   </data>
   <data name="toolStripMenuItemExit.Text" xml:space="preserve">
-    <value>Exit</value>
+    <value>終了</value>
   </data>
   <data name="buttonConfig.ToolTip" xml:space="preserve">
-    <value>Open Settings</value>
+    <value>設定を開く</value>
   </data>
   <data name="buttonAdd.ToolTip" xml:space="preserve">
-    <value>Add Application</value>
+    <value>アプリケーションを追加</value>
   </data>
   <data name="buttonRemove.ToolTip" xml:space="preserve">
-    <value>Remove</value>
+    <value>削除</value>
   </data>
   <data name="labelProcessName.Text" xml:space="preserve">
-    <value>Process Name</value>
+    <value>プロセス名</value>
   </data>
   <data name="labelAppName.Text" xml:space="preserve">
-    <value>Application Name</value>
+    <value>アプリケーション名</value>
   </data>
   <data name="labelVolume.Text" xml:space="preserve">
-    <value>Volume</value>
+    <value>ボリューム</value>
   </data>
   <data name="buttonUpdate.Text" xml:space="preserve">
-    <value>Update</value>
+    <value>更新</value>
   </data>
   <data name="buttonOk.Text" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="buttonCancel.Text" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
   <data name="labelOpacity.Text" xml:space="preserve">
-    <value>Window Opacity (20-100):</value>
+    <value>ウィンドウ不透明度(20-100):</value>
   </data>
   <data name="labelCurrentOpacity.Text" xml:space="preserve">
-    <value>Current</value>
+    <value>現在</value>
   </data>
 </root>
