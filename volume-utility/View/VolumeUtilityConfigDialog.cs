@@ -1,4 +1,5 @@
 ﻿using volume_utility.Utils;
+using volume_utility.Properties;
 
 namespace volume_utility.View
 {
